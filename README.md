@@ -7,6 +7,77 @@ It works on ESP8266 and ESP32 boards although ESP32 is recommended since it has 
 
 To get support or discuss about this project, request an [invitation to Byteball Slack](http://slack.byteball.org/) and join **#byteduino** channel.
 
+### Extras
+
+- Latest Byteball testnet wallet for Linux 👉 http://papabyte.com/byteball-tn-linux64.zip
+- Testnet faucet from https://byteball.org/testnet.html to receive free bytes 👉 [click here](byteball-tn:AxBxXDnPOzE/AxLHmidAjwLPFtQ6dK3k70zM0yKVeDzC@byteball.org/bb-test#0000)
+<details><summary>a sequence diagram how it works</summary>
+
+copy-paste this on https://mermaidjs.github.io/mermaid-live-editor
+```mermaid
+sequenceDiagram
+  participant wb as Web Browser
+  participant uC as Microcontroller (µC)
+  participant bb as Byteball DAG
+
+  Note over uC: power on or <br> press RST button
+  uC->>uC: connecting to AP
+  Note over uC: print device IP
+  Note over uC: start webserver
+
+  uC->>+bb: REQ [wss://] CONNECTION
+  bb->>-uC: CONNECTED
+  Note over uC,bb: wss://byteball.org/bb-test
+
+  Note over uC: print wallet info
+
+  Note over wb: open µC IP Address
+
+  loop client.connected() == true
+    wb->>+uC: GET /* (not contain favico)
+    uC->>-wb: get full web page
+
+    wb->>+uC: GET /device_infos.json
+    uC->>bb: 
+    bb->>uC: 
+    uC->>-wb: µC wallet info
+
+    wb->>+uC: GET /paired_devices.json
+    uC->>bb: 
+    bb->>uC: 
+    uC->>-wb: desktop/mobile wallet info
+
+    wb->>+uC: GET /wallets.json
+    uC->>bb: 
+    bb->>uC: 
+    uC->>-wb: single address wallet info
+
+    Note over wb,uC: ---->>-----polling every 2s---->>-----
+    loop browser tab with µC IP Address is open
+      wb->>+uC: GET /ongoing_signature.json
+      uC->>bb: 
+      bb->>uC: 
+      alt no sign request
+        uC->>wb: {}
+      else there is a sign request
+        uC->>-wb: info of cosigned request
+
+        Note right of wb: button appeared
+        alt click "Sign"
+          wb->>+uC: POST /confirm_signature
+          uC->>-bb: acceptToSign(textToSign)
+          Note over uC: print<br>"deny signature"
+        else click "Deny"
+          wb->>+uC: POST /refuse_signature
+          uC->>-bb: refuseTosign(textToSign)
+          Note over uC: print<br>"confirm signature"
+        end
+      end
+    end
+  end
+```
+</details>
+
 **Blackbytes are not supported**
 
 ### Instructions
@@ -63,7 +134,7 @@ Authenticated by hub
 - From your Byteball wallet, add the hardware cosigner to your correspondents list by using the pairing code provided above as invitation code.
 
 #### Create a multidevice wallet
-- From your Byteball wallet, create a multidevice wallet with the hardware device as one of the cosigner. Only **single address wallet** is supported.
+- From your Byteball wallet, create a multidevice wallet with the hardware device as one of the cosigner. Only **single address wallet** is supported. (For testnet wallet, you can download it [here](http://papabyte.com/byteball-tn-linux64.zip))
 
 #### Cosign a transaction
 - Select your multidevice wallet and click on send a transaction, the wallet will ask you to approve the transaction on other devices. Go to the cosigner control webpage and click on confirm.
