@@ -7,9 +7,7 @@
 #if defined (ESP32)
 #include <WiFiMulti.h>
 WiFiMulti WiFiMulti;
-#endif
-
-#if defined (ESP8266)
+#else
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266WebServer.h>
 ESP8266WiFiMulti WiFiMulti;
@@ -93,7 +91,7 @@ void loop() {
         // so you can send a reply
         if (c == '\n' && currentLineIsBlank) {
 
-          // Here is where the POST data is.
+          // Here is where the POST/GET data is.
           int j = 0;
           while (client.available())
           {
@@ -101,7 +99,6 @@ void loop() {
             j++;
           }
           textToSign[44] = 0x00;
-          Serial.println(textToSign);
 
           if (strstr(bufferClient, "ongoing_signature.json") != nullptr) {
             sendOnGoingSignatureJson(client);
