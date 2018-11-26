@@ -19,6 +19,7 @@ void sendWebpage(WiFiClient &client);
 void setup() {
 
   Serial.begin(115200);
+  pinMode(2, OUTPUT);
 
   while (!Serial)
     continue;
@@ -42,6 +43,7 @@ void setup() {
 
 
   server.begin();
+  digitalWrite(2, HIGH);
 }
 
 void sendWalletsJson(WiFiClient &client) {
@@ -114,6 +116,7 @@ void loop() {
           } else if (strstr(bufferClient, "confirm_signature") != nullptr) {
             acceptToSign(textToSign);
             Serial.println("confirm signature");
+            digitalWrite(2, LOW);
           } else if (strstr(bufferClient, "favico") == nullptr ) {
             sendWebpage(client);
           }

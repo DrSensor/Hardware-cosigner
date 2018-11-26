@@ -66,11 +66,11 @@ sequenceDiagram
         alt click "Sign"
           wb->>+uC: POST /confirm_signature
           uC->>-bb: acceptToSign(textToSign)
-          Note over uC: print<br>"deny signature"
+          Note over uC: print<br>"confirm signature"
         else click "Deny"
           wb->>+uC: POST /refuse_signature
           uC->>-bb: refuseTosign(textToSign)
-          Note over uC: print<br>"confirm signature"
+          Note over uC: print<br>"deny signature"
         end
       end
     end
